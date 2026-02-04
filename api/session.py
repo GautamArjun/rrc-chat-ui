@@ -43,7 +43,11 @@ def load_session(session_id: str):
             )
             row = cur.fetchone()
             if row:
-                return row["study_id"], json.loads(row["state"])
+                state = row["state"]
+                # psycopg automatically deserializes JSONB, but handle both cases
+                if isinstance(state, str):
+                    state = json.loads(state)
+                return row["study_id"], state
     return None
 
 
