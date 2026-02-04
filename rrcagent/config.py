@@ -18,8 +18,9 @@ class StudyConfigError(Exception):
 _REQUIRED_SECTIONS = ("study", "messaging", "pre_screen", "eligibility")
 
 # Default base path: <project_root>/studies/
+# On Vercel, the structure is /var/task/rrcagent/config.py, so parent.parent = /var/task
 _DEFAULT_BASE_PATH = str(
-    Path(__file__).resolve().parent.parent.parent / "studies"
+    Path(__file__).resolve().parent.parent / "studies"
 )
 
 
