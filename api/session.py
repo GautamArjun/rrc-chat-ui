@@ -1,31 +1,25 @@
 """POST /api/session - Create a new chat session."""
 
+from http.server import BaseHTTPRequestHandler
 import json
 import os
+import sys
 import uuid
-from http.server import BaseHTTPRequestHandler
+
+# Add project root to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 import psycopg
 from psycopg.rows import dict_row
 
-# Import the agent code
-import sys
-sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
-from rrcagent.config import load_study_config
-from rrcagent.graph import step_graph, build_graph
-from rrcagent.db import Database
-
-
-def get_db():
-    """Get database connection."""
-    return Database(os.environ.get("DATABASE_URL"))
+def get_db_url():
+    return os.environ.get("DATABASE_URL")
 
 
 def save_session(session_id: str, study_id: str, state: dict):
     """Save session state to database."""
-    db_url = os.environ.get("DATABASE_URL")
-    with psycopg.connect(db_url) as conn:
+    with psycopg.connect(get_db_url()) as conn:
         with conn.cursor() as cur:
             cur.execute(
                 """
@@ -39,16 +33,27 @@ def save_session(session_id: str, study_id: str, state: dict):
             conn.commit()
 
 
+def load_session(session_id: str):
+    """Load session state from database."""
+    with psycopg.connect(get_db_url(), row_factory=dict_row) as conn:
+        with conn.cursor() as cur:
+            cur.execute(
+                "SELECT study_id, state FROM rrc_sessions WHERE session_id = %s",
+                (session_id,)
+            )
+            row = cur.fetchone()
+            if row:
+                return row["study_id"], json.loads(row["state"])
+    return None
+
+
 def state_to_response(session_id: str, state: dict) -> dict:
     """Convert agent state to API response."""
     step = state.get("current_step", "")
 
     # Determine response type
     terminal_steps = {"consent_declined", "auth_fail_handoff", "qualified_handoff", "disqualified"}
-    if step in terminal_steps:
-        resp_type = "end"
-    else:
-        resp_type = "text"
+    resp_type = "end" if step in terminal_steps else "text"
 
     # Get last assistant message
     message = ""
@@ -173,19 +178,22 @@ def state_to_response(session_id: str, state: dict) -> dict:
 
 class handler(BaseHTTPRequestHandler):
     def do_POST(self):
-        # Read request body
-        content_length = int(self.headers.get('Content-Length', 0))
-        body = self.rfile.read(content_length)
-
         try:
+            content_length = int(self.headers.get('Content-Length', 0))
+            body = self.rfile.read(content_length)
             data = json.loads(body) if body else {}
             study_id = data.get("study_id", "zyn")
+
+            # Import agent modules
+            from rrcagent.config import load_study_config
+            from rrcagent.graph import step_graph, build_graph
+            from rrcagent.db import Database
 
             # Load study config
             study_config = load_study_config(study_id)
 
             # Create services
-            db = get_db()
+            db = Database(get_db_url())
             services = {"db": db}
 
             # Build graph and run greeting
@@ -206,14 +214,17 @@ class handler(BaseHTTPRequestHandler):
 
             self.send_response(200)
             self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
             self.wfile.write(json.dumps(response).encode())
 
         except Exception as e:
+            import traceback
             self.send_response(500)
             self.send_header('Content-Type', 'application/json')
+            self.send_header('Access-Control-Allow-Origin', '*')
             self.end_headers()
-            self.wfile.write(json.dumps({"error": str(e)}).encode())
+            self.wfile.write(json.dumps({"error": str(e), "trace": traceback.format_exc()}).encode())
 
     def do_OPTIONS(self):
         self.send_response(200)
