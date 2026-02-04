@@ -30,9 +30,9 @@ export const IdentityForm: React.FC<IdentityFormProps> = ({ onSubmit }) => {
     <div className="w-full max-w-md mx-auto px-4 mb-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+        className="bg-white border border-gray-200 rounded-rrc p-6 shadow-sm"
       >
-        <h3 className="text-lg font-semibold text-gray-900 mb-4">
+        <h3 className="text-lg font-semibold text-rrc-primary mb-4">
           Contact Information
         </h3>
 
@@ -40,7 +40,7 @@ export const IdentityForm: React.FC<IdentityFormProps> = ({ onSubmit }) => {
           <div>
             <label
               htmlFor="email"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-rrc-primary mb-1"
             >
               Email Address
             </label>
@@ -51,14 +51,14 @@ export const IdentityForm: React.FC<IdentityFormProps> = ({ onSubmit }) => {
               onChange={(e) => setEmail(e.target.value)}
               placeholder="you@example.com"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rrc-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-rrc focus:outline-none focus:ring-2 focus:ring-rrc-accent focus:border-rrc-accent text-rrc-primary"
             />
           </div>
 
           <div>
             <label
               htmlFor="phone"
-              className="block text-sm font-medium text-gray-700 mb-1"
+              className="block text-sm font-medium text-rrc-primary mb-1"
             >
               Phone Number
             </label>
@@ -69,7 +69,7 @@ export const IdentityForm: React.FC<IdentityFormProps> = ({ onSubmit }) => {
               onChange={(e) => setPhone(formatPhone(e.target.value))}
               placeholder="919-555-0100"
               required
-              className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rrc-blue focus:border-transparent"
+              className="w-full px-4 py-2 border border-gray-300 rounded-rrc focus:outline-none focus:ring-2 focus:ring-rrc-accent focus:border-rrc-accent text-rrc-primary"
             />
           </div>
         </div>
@@ -77,9 +77,9 @@ export const IdentityForm: React.FC<IdentityFormProps> = ({ onSubmit }) => {
         <button
           type="submit"
           disabled={!email || !phone}
-          className="w-full mt-6 px-4 py-3 bg-rrc-blue text-white rounded-lg font-medium hover:bg-rrc-blue-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="w-full mt-6 px-4 py-3 bg-rrc-accent text-white rounded-rrc font-semibold hover:bg-rrc-accent-dark transition-colors disabled:bg-rrc-muted disabled:cursor-not-allowed"
         >
-          Submit
+          Continue
         </button>
       </form>
     </div>

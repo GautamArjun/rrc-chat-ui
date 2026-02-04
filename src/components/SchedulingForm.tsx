@@ -44,11 +44,11 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({
     <div className="w-full max-w-md mx-auto px-4 mb-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+        className="bg-white border border-gray-200 rounded-rrc p-6 shadow-sm"
       >
         {fields.map((field) => (
           <div key={field.name} className="mb-6 last:mb-0">
-            <label className="block text-sm font-medium text-gray-700 mb-3">
+            <label className="block text-sm font-semibold text-rrc-primary mb-3">
               {field.label}
             </label>
             <div className="space-y-2">
@@ -59,19 +59,19 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({
                 return (
                   <label
                     key={option}
-                    className={`flex items-center gap-3 p-3 border rounded-lg cursor-pointer transition-all ${
+                    className={`flex items-center gap-3 p-3 border rounded-rrc cursor-pointer transition-all ${
                       isSelected
-                        ? 'border-rrc-blue bg-blue-50'
-                        : 'border-gray-200 hover:border-gray-300'
+                        ? 'border-rrc-accent bg-blue-50'
+                        : 'border-gray-200 hover:border-rrc-muted'
                     }`}
                   >
                     <input
                       type="checkbox"
                       checked={isSelected}
                       onChange={() => handleToggle(field.name, option)}
-                      className="w-4 h-4 text-rrc-blue rounded focus:ring-rrc-blue"
+                      className="w-4 h-4 text-rrc-accent rounded focus:ring-rrc-accent"
                     />
-                    <span className="text-gray-900 text-sm">{option}</span>
+                    <span className="text-rrc-primary text-sm">{option}</span>
                   </label>
                 );
               })}
@@ -82,9 +82,9 @@ export const SchedulingForm: React.FC<SchedulingFormProps> = ({
         <button
           type="submit"
           disabled={!isValid}
-          className="w-full mt-4 px-4 py-3 bg-rrc-blue text-white rounded-lg font-medium hover:bg-rrc-blue-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="w-full mt-4 px-4 py-3 bg-rrc-accent text-white rounded-rrc font-semibold hover:bg-rrc-accent-dark transition-colors disabled:bg-rrc-muted disabled:cursor-not-allowed"
         >
-          Submit
+          Continue
         </button>
       </form>
     </div>

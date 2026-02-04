@@ -98,21 +98,23 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   const showTextInput = responseType === 'text' && !isDone && !isLoading;
 
   return (
-    <div className="flex flex-col min-h-screen bg-gray-50">
+    <div className="flex flex-col min-h-screen bg-rrc-bg">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-white border-b border-gray-200 shadow-sm">
+      <header className="sticky top-0 z-40 bg-rrc-primary shadow-md">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-rrc-blue rounded-full flex items-center justify-center">
-              <span className="text-white font-bold text-lg">R</span>
+            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
+              <span className="text-rrc-primary font-bold text-lg">RRC</span>
             </div>
             <div className="flex flex-col">
-              <span className="font-semibold text-gray-900">Rose Research Center</span>
-              <span className="text-xs text-gray-500">Study Screening Assistant</span>
+              <span className="font-semibold text-white">Rose Research Center</span>
+              <span className="text-xs text-rrc-muted">Study Screening Assistant</span>
             </div>
           </div>
           <div className="hidden sm:block">
-            <span className="text-sm text-gray-500">ZYN Nicotine Pouch Study</span>
+            <span className="text-sm text-rrc-muted bg-rrc-primary-light px-3 py-1 rounded-full">
+              ZYN Nicotine Pouch Study
+            </span>
           </div>
         </div>
       </header>
@@ -135,7 +137,7 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       {/* Input Area */}
       {showTextInput && (
-        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4">
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 p-4 shadow-lg">
           <div className="max-w-3xl mx-auto">
             <ChatInput onSend={onSendMessage} disabled={isLoading} />
           </div>
@@ -144,8 +146,8 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
 
       {/* Done state */}
       {isDone && (
-        <div className="fixed bottom-0 left-0 right-0 bg-gray-100 border-t border-gray-200 p-4">
-          <div className="max-w-3xl mx-auto text-center text-gray-500">
+        <div className="fixed bottom-0 left-0 right-0 bg-rrc-primary p-4">
+          <div className="max-w-3xl mx-auto text-center text-white">
             This conversation has ended. Thank you for your time.
           </div>
         </div>

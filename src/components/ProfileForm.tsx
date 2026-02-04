@@ -34,7 +34,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ fields, onSubmit }) =>
           value={value}
           onChange={(e) => handleChange(field.name, e.target.value)}
           required
-          className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rrc-blue focus:border-transparent bg-white"
+          className="w-full px-4 py-2 border border-gray-300 rounded-rrc focus:outline-none focus:ring-2 focus:ring-rrc-accent focus:border-rrc-accent bg-white text-rrc-primary"
         >
           <option value="">Select...</option>
           {field.options.map((option) => (
@@ -64,7 +64,7 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ fields, onSubmit }) =>
         value={value}
         onChange={(e) => handleChange(field.name, e.target.value)}
         required
-        className="w-full px-4 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-rrc-blue focus:border-transparent"
+        className="w-full px-4 py-2 border border-gray-300 rounded-rrc focus:outline-none focus:ring-2 focus:ring-rrc-accent focus:border-rrc-accent text-rrc-primary"
       />
     );
   };
@@ -75,14 +75,14 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ fields, onSubmit }) =>
     <div className="w-full max-w-md mx-auto px-4 mb-6">
       <form
         onSubmit={handleSubmit}
-        className="bg-white border border-gray-200 rounded-xl p-6 shadow-sm"
+        className="bg-white border border-gray-200 rounded-rrc p-6 shadow-sm"
       >
         <div className="space-y-4">
           {fields.map((field) => (
             <div key={field.name}>
               <label
                 htmlFor={field.name}
-                className="block text-sm font-medium text-gray-700 mb-1"
+                className="block text-sm font-medium text-rrc-primary mb-1"
               >
                 {field.label}
               </label>
@@ -94,9 +94,9 @@ export const ProfileForm: React.FC<ProfileFormProps> = ({ fields, onSubmit }) =>
         <button
           type="submit"
           disabled={!isValid}
-          className="w-full mt-6 px-4 py-3 bg-rrc-blue text-white rounded-lg font-medium hover:bg-rrc-blue-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+          className="w-full mt-6 px-4 py-3 bg-rrc-accent text-white rounded-rrc font-semibold hover:bg-rrc-accent-dark transition-colors disabled:bg-rrc-muted disabled:cursor-not-allowed"
         >
-          Submit
+          Continue
         </button>
       </form>
     </div>

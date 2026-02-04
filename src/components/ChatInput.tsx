@@ -32,7 +32,7 @@ export const ChatInput: React.FC<ChatInputProps> = ({
   };
 
   return (
-    <div className="flex gap-2">
+    <div className="flex gap-3">
       <input
         type={type}
         value={input}
@@ -40,12 +40,12 @@ export const ChatInput: React.FC<ChatInputProps> = ({
         onKeyDown={handleKeyDown}
         placeholder={placeholder}
         disabled={disabled}
-        className="flex-1 px-4 py-3 border border-gray-300 rounded-full focus:outline-none focus:ring-2 focus:ring-rrc-blue focus:border-transparent disabled:bg-gray-100 disabled:cursor-not-allowed"
+        className="flex-1 px-4 py-3 border border-gray-300 rounded-rrc focus:outline-none focus:ring-2 focus:ring-rrc-accent focus:border-rrc-accent disabled:bg-gray-100 disabled:cursor-not-allowed text-rrc-primary"
       />
       <button
         onClick={handleSend}
         disabled={disabled || !input.trim()}
-        className="px-6 py-3 bg-rrc-blue text-white rounded-full font-medium hover:bg-rrc-blue-dark transition-colors disabled:bg-gray-300 disabled:cursor-not-allowed"
+        className="px-6 py-3 bg-rrc-accent text-white rounded-rrc font-semibold hover:bg-rrc-accent-dark transition-colors disabled:bg-rrc-muted disabled:cursor-not-allowed"
       >
         Send
       </button>

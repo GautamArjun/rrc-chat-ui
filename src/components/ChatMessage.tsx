@@ -16,13 +16,13 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
     >
       {/* Avatar */}
       <div
-        className={`w-8 h-8 rounded-full flex-shrink-0 flex items-center justify-center ${
-          isUser ? 'bg-gray-200' : 'bg-rrc-blue'
+        className={`w-8 h-8 rounded-lg flex-shrink-0 flex items-center justify-center ${
+          isUser ? 'bg-rrc-muted' : 'bg-rrc-primary'
         }`}
       >
         {isUser ? (
           <svg
-            className="w-4 h-4 text-gray-600"
+            className="w-4 h-4 text-white"
             fill="currentColor"
             viewBox="0 0 20 20"
           >
@@ -33,19 +33,19 @@ export const ChatMessage: React.FC<ChatMessageProps> = ({ message }) => {
             />
           </svg>
         ) : (
-          <span className="text-white font-semibold text-sm">R</span>
+          <span className="text-white font-semibold text-xs">RRC</span>
         )}
       </div>
 
       {/* Message bubble */}
       <div
-        className={`max-w-[75%] px-4 py-3 rounded-2xl ${
+        className={`max-w-[75%] px-4 py-3 rounded-rrc ${
           isUser
-            ? 'bg-rrc-blue text-white rounded-tr-none'
-            : 'bg-white border border-gray-200 rounded-tl-none shadow-sm'
+            ? 'bg-rrc-accent text-white rounded-tr-none'
+            : 'bg-white border border-gray-200 rounded-tl-none shadow-sm text-rrc-primary'
         }`}
       >
-        <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+        <p className="text-sm whitespace-pre-wrap leading-relaxed">{message.content}</p>
       </div>
     </div>
   );

@@ -3,8 +3,14 @@
 @tailwind utilities;
 
 :root {
-  --foreground-rgb: 0, 0, 0;
-  --background-rgb: 249, 250, 251;
+  --rrc-primary: #293a44;
+  --rrc-primary-light: #3d5060;
+  --rrc-accent: #0061d4;
+  --rrc-accent-dark: #00469a;
+  --rrc-muted: #a1b4bf;
+  --rrc-bg: #f3f3f3;
+  --foreground-rgb: 41, 58, 68;
+  --background-rgb: 243, 243, 243;
 }
 
 body {
@@ -12,22 +18,22 @@ body {
   background: rgb(var(--background-rgb));
 }
 
-/* Custom scrollbar */
+/* Custom scrollbar with RRC colors */
 ::-webkit-scrollbar {
   width: 6px;
 }
 
 ::-webkit-scrollbar-track {
-  background: #f1f1f1;
+  background: #f3f3f3;
 }
 
 ::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
+  background: #a1b4bf;
   border-radius: 3px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: #a1a1a1;
+  background: #293a44;
 }
 
 /* Typing indicator animation */
