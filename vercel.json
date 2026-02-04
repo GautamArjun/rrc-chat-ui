@@ -12,8 +12,12 @@
   ],
   "routes": [
     {
-      "src": "/api/(.*)",
-      "dest": "/api/$1"
+      "src": "/api/session",
+      "dest": "/api/session.py"
+    },
+    {
+      "src": "/api/chat",
+      "dest": "/api/chat.py"
     }
   ]
 }
