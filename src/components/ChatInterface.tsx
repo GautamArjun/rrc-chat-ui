@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useRef, useEffect } from 'react';
+import Image from 'next/image';
 import { Message, FieldDescriptor } from '@/types/chat';
 import { ChatMessage } from './ChatMessage';
 import { ChatInput } from './ChatInput';
@@ -100,19 +101,20 @@ export const ChatInterface: React.FC<ChatInterfaceProps> = ({
   return (
     <div className="flex flex-col min-h-screen bg-rrc-bg">
       {/* Header */}
-      <header className="sticky top-0 z-40 bg-rrc-primary shadow-md">
+      <header className="sticky top-0 z-40 bg-white shadow-md border-b border-gray-200">
         <div className="max-w-3xl mx-auto px-4 h-16 flex items-center justify-between">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-white rounded-lg flex items-center justify-center shadow-sm">
-              <span className="text-rrc-primary font-bold text-lg">RRC</span>
-            </div>
-            <div className="flex flex-col">
-              <span className="font-semibold text-white">Rose Research Center</span>
-              <span className="text-xs text-rrc-muted">Study Screening Assistant</span>
-            </div>
+            <Image
+              src="/rrc-logo.png"
+              alt="Rose Research Center"
+              width={180}
+              height={40}
+              className="h-10 w-auto"
+              priority
+            />
           </div>
-          <div className="hidden sm:block">
-            <span className="text-sm text-rrc-muted bg-rrc-primary-light px-3 py-1 rounded-full">
+          <div className="hidden sm:flex items-center gap-2">
+            <span className="text-sm text-rrc-primary font-medium bg-rrc-bg px-3 py-1.5 rounded-full border border-gray-200">
               ZYN Nicotine Pouch Study
             </span>
           </div>
