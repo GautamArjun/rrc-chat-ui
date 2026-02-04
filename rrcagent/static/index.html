@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Rose Research Center — Study Screening</title>
+  <link rel="stylesheet" href="/static/style.css">
+</head>
+<body>
+  <div id="chat-container" class="chat-container">
+    <div class="chat-header">
+      <div class="chat-header-info">
+        <div class="chat-header-title">
+          <span class="status-dot"></span>
+          Rose Research Center
+        </div>
+        <div class="logo-text">Study Screening Assistant</div>
+      </div>
+    </div>
+
+    <div id="chat-messages" class="chat-messages">
+      <div id="typing-indicator" class="typing-indicator">
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+        <span class="typing-dot"></span>
+      </div>
+    </div>
+
+    <div class="chat-input-bar">
+      <input
+        id="chat-input"
+        type="text"
+        placeholder="Type your message..."
+        disabled
+        autocomplete="off"
+      >
+      <button id="send-btn" disabled>Send</button>
+    </div>
+  </div>
+
+  <script src="/static/app.js"></script>
+</body>
+</html>

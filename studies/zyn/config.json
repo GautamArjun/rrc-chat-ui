@@ -1,0 +1,182 @@
+{
+  "study": {
+    "id": "ZYN-2024",
+    "name": "ZYN Nicotine Pouch Study",
+    "description": "Evaluate impact of ZYN nicotine pouch flavors on cigarette usage",
+    "duration": "13.5 months",
+    "compensation": {
+      "total": "$2,590",
+      "schedule": [
+        { "milestone": "First virtual screening", "amount": "$20" },
+        { "milestone": "Second virtual screening", "amount": "$25" }
+      ]
+    }
+  },
+
+  "messaging": {
+    "greeting": "You may be a good fit for studies we're running.",
+    "disqualification": "Thanks for your time. At the moment, we don't have a study match based on your responses. If anything changes, our team may reach out.",
+    "anti_coaching": "I can't help you change answers to qualify. I can only record what's true and help schedule a call if you're eligible.",
+    "pin_failure": "I'm unable to confirm your identity right now. I'll transfer this to a member of our team to help you continue."
+  },
+
+  "faq": {
+    "source": "studies/zyn/ZYN_FAQ.docx"
+  },
+
+  "pre_screen": {
+    "questions": [
+      {
+        "id": "icf_english",
+        "question": "Are you able to read, understand, and willing to sign an informed consent form and complete questionnaires written in English?",
+        "type": "yes_no",
+        "required": true,
+        "disqualify_on": "no"
+      },
+      {
+        "id": "remote_visits",
+        "question": "Are you willing to complete a remote visit every two weeks using our eResearch application?",
+        "type": "yes_no",
+        "required": true,
+        "disqualify_on": "no"
+      },
+      {
+        "id": "smartphone_surveys",
+        "question": "Do you own a smart phone with text message and data capabilities compatible with necessary surveys?",
+        "type": "yes_no",
+        "required": true,
+        "disqualify_on": "no"
+      },
+      {
+        "id": "nicotine_treatment_intent",
+        "question": "Do you intend to use an FDA-approved treatment for nicotine dependence (i.e., Nicotine gum, patch, lozenge, etc.) within the next 4 months?",
+        "type": "yes_no",
+        "required": true,
+        "disqualify_on": "yes"
+      },
+      {
+        "id": "cigar_frequency",
+        "question": "If you use cigars, how often do you smoke cigars?",
+        "type": "choice",
+        "required": false,
+        "options": ["Daily", "Weekly", "Monthly or less", "N/A"]
+      },
+      {
+        "id": "nicotine_pouch_use",
+        "question": "Do you currently use nicotine pouches?",
+        "type": "yes_no",
+        "required": true
+      },
+      {
+        "id": "cigarette_years",
+        "question": "How many years have you smoked cigarettes?",
+        "type": "number",
+        "required": true
+      },
+      {
+        "id": "cigarette_days_per_week",
+        "question": "How many days a week do you smoke cigarettes?",
+        "type": "number",
+        "required": true
+      },
+      {
+        "id": "cigarettes_per_day",
+        "question": "How many cigarettes do you smoke on a typical day?",
+        "type": "number",
+        "required": true
+      },
+      {
+        "id": "marijuana_use",
+        "question": "Do you currently smoke marijuana or use any marijuana products?",
+        "type": "yes_no",
+        "required": true,
+        "follow_up": [
+          {
+            "id": "marijuana_form",
+            "question": "What forms of marijuana do you use?",
+            "type": "choice",
+            "options": ["Combustible", "Edibles"],
+            "condition": "yes"
+          },
+          {
+            "id": "marijuana_duration",
+            "question": "How long have you been smoking marijuana?",
+            "type": "choice",
+            "options": ["Less than a year", "A year or longer"],
+            "condition": "yes"
+          },
+          {
+            "id": "marijuana_frequency",
+            "question": "How frequently do you use marijuana?",
+            "type": "choice",
+            "options": ["Weekly", "Bi-weekly", "Monthly or less"],
+            "condition": "yes"
+          },
+          {
+            "id": "marijuana_reason",
+            "question": "What is your reason for marijuana use?",
+            "type": "choice",
+            "options": ["Recreational", "Medical condition"],
+            "condition": "yes"
+          }
+        ]
+      },
+      {
+        "id": "recent_study_participation",
+        "question": "Have you participated in a research study within the last 30 days?",
+        "type": "yes_no",
+        "required": true
+      },
+      {
+        "id": "household_participation",
+        "question": "Is anyone living in your household screening for, participating in, or has participated in this study?",
+        "type": "yes_no",
+        "required": true
+      },
+      {
+        "id": "pregnancy_status",
+        "question": "Are you pregnant, nursing, or trying to become pregnant?",
+        "type": "yes_no",
+        "required": true,
+        "disqualify_on": "yes"
+      },
+      {
+        "id": "contraception_willingness",
+        "question": "Are you willing to use a form of contraception acceptable to the PI from the time of the screening visit until the end of the study?",
+        "type": "yes_no",
+        "required": false,
+        "condition_field": "gender",
+        "condition_value": "Female"
+      },
+      {
+        "id": "medical_conditions",
+        "question": "Please list any current or past serious medical or psychiatric conditions.",
+        "type": "free_text",
+        "required": true
+      },
+      {
+        "id": "medications",
+        "question": "Please list any prescriptions, over the counter medications, and supplements you are taking or have taken in the last 30 days.",
+        "type": "free_text",
+        "required": true
+      }
+    ]
+  },
+
+  "eligibility": {
+    "inclusion": [
+      { "field": "age", "operator": "between", "values": [22, 65] },
+      { "field": "cigarettes_per_day", "operator": ">=", "value": 10 },
+      { "field": "cigarette_years_smoked", "operator": ">=", "value": 1 },
+      { "field": "has_smartphone", "operator": "==", "value": true }
+    ],
+    "exclusion": [
+      { "field": "pregnant_or_nursing_or_planning", "operator": "==", "value": true },
+      {
+        "field": "serious_medical_conditions",
+        "operator": "contains_any",
+        "values": ["unstable angina", "congestive heart failure", "cirrhosis", "epilepsy"]
+      }
+    ]
+  }
+}
