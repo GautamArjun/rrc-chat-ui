@@ -15,11 +15,8 @@ from psycopg.rows import dict_row
 from api.session import get_db_url, load_session
 
 
-def get_lead_data(lead_id: int) -> dict | None:
-    """Get lead record from database."""
-    if not lead_id:
-        return None
-
+def get_lead_data(lead_id: int = None, email: str = None, phone: str = None) -> dict | None:
+    """Get lead record from database by lead_id or email/phone."""
     db_url = get_db_url()
     if not db_url:
         return None
@@ -27,14 +24,40 @@ def get_lead_data(lead_id: int) -> dict | None:
     try:
         with psycopg.connect(db_url, row_factory=dict_row) as conn:
             with conn.cursor() as cur:
-                cur.execute(
-                    "SELECT * FROM rrc_leads WHERE lead_id = %s",
-                    (lead_id,)
-                )
-                row = cur.fetchone()
-                if row:
-                    # Convert to regular dict and handle any non-serializable types
-                    return {k: (str(v) if v is not None else None) for k, v in dict(row).items()}
+                # Try by lead_id first
+                if lead_id:
+                    cur.execute(
+                        "SELECT * FROM rrc_leads WHERE lead_id = %s",
+                        (lead_id,)
+                    )
+                    row = cur.fetchone()
+                    if row:
+                        return {k: (str(v) if v is not None else None) for k, v in dict(row).items()}
+
+                # Try by email
+                if email:
+                    cur.execute(
+                        "SELECT * FROM rrc_leads WHERE LOWER(email) = LOWER(%s)",
+                        (email,)
+                    )
+                    row = cur.fetchone()
+                    if row:
+                        return {k: (str(v) if v is not None else None) for k, v in dict(row).items()}
+
+                # Try by phone (normalize)
+                if phone:
+                    normalized_phone = "".join(c for c in phone if c.isdigit())
+                    cur.execute(
+                        """
+                        SELECT * FROM rrc_leads
+                        WHERE REGEXP_REPLACE(mobile_phone, '[^0-9]', '', 'g') = %s
+                        """,
+                        (normalized_phone,)
+                    )
+                    row = cur.fetchone()
+                    if row:
+                        return {k: (str(v) if v is not None else None) for k, v in dict(row).items()}
+
     except Exception as e:
         print(f"Error fetching lead data: {e}")
 
@@ -131,19 +154,28 @@ class handler(BaseHTTPRequestHandler):
 
             study_id, state = session_data
 
-            # Get lead_id from state
-            lead_record = state.get("lead_record", {})
-            lead_id = lead_record.get("lead_id") if lead_record else None
+            # Get lead_id from state (try multiple places)
+            lead_record = state.get("lead_record", {}) or {}
+            lead_id = lead_record.get("lead_id")
 
-            # Fetch current lead data from DB
-            lead_data = get_lead_data(lead_id) if lead_id else None
+            # Get identity info for fallback lookup
+            lead_identity = state.get("lead_identity", {}) or {}
+            email = lead_identity.get("email") or lead_record.get("email")
+            phone = lead_identity.get("phone") or lead_record.get("mobile_phone")
+
+            # Fetch current lead data from DB (try lead_id first, then email/phone)
+            lead_data = get_lead_data(lead_id=lead_id, email=email, phone=phone)
 
             # Get missing fields from state
             missing_fields = set(state.get("missing_fields", []))
 
+            # Get lead_id from lead_data if we found a record
+            if lead_data and not lead_id:
+                lead_id = lead_data.get("lead_id")
+
             response = {
                 "session_id": session_id,
-                "lead_id": lead_id,
+                "lead_id": int(lead_id) if lead_id else None,
                 "current_step": state.get("current_step", ""),
                 "lead_data": lead_data,
                 "missing_fields": list(missing_fields),
