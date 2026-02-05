@@ -30,6 +30,8 @@ _SAFE_FALLBACK = (
     "I can't provide guidance on how to qualify."
 )
 
+_NO_INFO_RESPONSE = "I don't have information about that in the study FAQ."
+
 
 class RagService:
     """FAQ answering service backed by document retrieval and LLM generation."""
@@ -71,7 +73,7 @@ class RagService:
 
         if not results:
             return {
-                "text": "I don't have information about that in the study FAQ.",
+                "text": _NO_INFO_RESPONSE,
                 "references": [],
             }
 
@@ -87,25 +89,26 @@ class RagService:
 
         context = "\n\n".join(context_parts)
 
-        # Build prompt
+        # Build prompt - strict FAQ-only answering
         prompt = (
             "You are a helpful assistant answering questions about a clinical study. "
-            "Answer based on the provided context. If the user's question relates to "
-            "any topic covered in the context, provide the relevant information even if "
-            "the wording differs. Be generous in matching intent — for example, a question "
-            "about 'how would I be paid' should be answered with compensation details. "
-            "Do NOT provide guidance on how to qualify for the study. "
-            "Do NOT mention eligibility criteria or screening logic. "
-            "Only say you don't have the information if the context is entirely unrelated "
-            "to the question.\n\n"
-            f"Context:\n{context}\n\n"
+            "You must ONLY use information from the FAQ context provided below. "
+            "Do NOT make up or infer any information not explicitly stated in the context.\n\n"
+            "STRICT RULES:\n"
+            "1. If the answer is directly stated in the context, provide it.\n"
+            "2. If the context does NOT contain information to answer the question, "
+            "you MUST respond with exactly: \"I don't have information about that in the study FAQ.\"\n"
+            "3. Do NOT provide guidance on how to qualify for the study.\n"
+            "4. Do NOT mention eligibility criteria or screening logic.\n"
+            "5. Do NOT guess, speculate, or provide information from outside the context.\n\n"
+            f"FAQ Context:\n{context}\n\n"
             f"Question: {question}\n\n"
-            "Answer:"
+            "Answer (using ONLY information from the FAQ context above, or say you don't have the information):"
         )
 
         raw_answer = self._llm.generate(prompt)
 
-        # Guardrail check
+        # Guardrail check for coaching language
         if _contains_coaching(raw_answer):
             return {"text": _SAFE_FALLBACK, "references": references}
 
