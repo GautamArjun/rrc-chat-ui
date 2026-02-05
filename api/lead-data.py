@@ -70,7 +70,7 @@ FIELD_GROUPS = [
         "name": "Identity",
         "fields": [
             ("email", "Email"),
-            ("phone", "Phone"),
+            ("mobile_phone", "Phone"),
         ]
     },
     {
