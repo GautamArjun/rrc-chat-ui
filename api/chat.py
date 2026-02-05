@@ -9,6 +9,7 @@ import sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from api.session import get_db_url, load_session, save_session, state_to_response
+from api.rag_utils import is_faq_question, init_rag_service, answer_faq
 
 
 class handler(BaseHTTPRequestHandler):
@@ -40,6 +41,19 @@ class handler(BaseHTTPRequestHandler):
                 return
 
             study_id, state = session_data
+
+            # Check if this is an FAQ question - route to RAG without advancing state
+            if is_faq_question(message):
+                rag = init_rag_service(study_id)
+                if rag:
+                    current_step = state.get("current_step", "")
+                    response = answer_faq(rag, message, study_id, current_step, session_id)
+                    self.send_response(200)
+                    self.send_header('Content-Type', 'application/json')
+                    self.send_header('Access-Control-Allow-Origin', '*')
+                    self.end_headers()
+                    self.wfile.write(json.dumps(response).encode())
+                    return
 
             # Import agent modules
             from rrcagent.graph import step_graph, build_graph
