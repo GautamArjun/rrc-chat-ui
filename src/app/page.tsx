@@ -9,6 +9,7 @@ export default function Home() {
   return (
     <ChatInterface
       messages={chat.messages}
+      sessionId={chat.sessionId}
       isLoading={chat.isLoading}
       currentStep={chat.currentStep}
       responseType={chat.responseType}

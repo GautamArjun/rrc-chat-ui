@@ -18,6 +18,10 @@
     {
       "src": "/api/chat",
       "dest": "/api/chat.py"
+    },
+    {
+      "src": "/api/lead-data",
+      "dest": "/api/lead-data.py"
     }
   ]
 }

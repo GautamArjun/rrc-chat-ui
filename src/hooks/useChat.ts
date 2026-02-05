@@ -103,6 +103,7 @@ export function useChat() {
 
   return {
     messages,
+    sessionId,
     isLoading,
     currentStep,
     responseType,
