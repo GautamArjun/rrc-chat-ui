@@ -21,9 +21,10 @@ def route_after_identity_collection(state: dict) -> str:
 def route_after_lead_lookup(state: dict) -> str:
     if state["is_new_lead"]:
         return "create_lead"
-    # Skip PIN auth if the lead has no PIN set
-    lead_record = state.get("lead_record") or {}
-    if not lead_record.get("pin_code"):
+    # Only require PIN auth for users with complete profiles —
+    # they've participated in previous RRC studies and been issued a PIN.
+    # Users with partial profiles are assumed to not have a PIN yet.
+    if state.get("missing_fields"):
         return "profile_collection"
     return "pin_auth"
 
