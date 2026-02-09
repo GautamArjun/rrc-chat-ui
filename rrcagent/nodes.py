@@ -169,6 +169,22 @@ _PHONE_RE = re.compile(r"\d{10}")
 
 def identity_collection_node(state: dict, **kwargs) -> dict:
     user_text = _last_user_text(state)
+
+    # Try JSON first (form submission from frontend)
+    parsed = _try_parse_json(user_text)
+    if parsed and "email" in parsed and "phone" in parsed:
+        email = parsed["email"].strip()
+        phone = "".join(c for c in parsed["phone"] if c.isdigit())
+        if _EMAIL_RE.match(email) and len(phone) >= 10:
+            return {
+                "lead_identity": {"email": email, "phone": phone[:10]},
+                "current_step": "identity_collected",
+                "messages": state["messages"] + [
+                    _msg("assistant", "Thank you! Let me look up your information.")
+                ],
+            }
+
+    # Fallback: regex extraction from plain text
     email_match = _EMAIL_RE.search(user_text)
     phone_match = _PHONE_RE.search(user_text.replace("-", "").replace(" ", "").replace("(", "").replace(")", ""))
 

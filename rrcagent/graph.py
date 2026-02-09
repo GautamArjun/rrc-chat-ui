@@ -254,6 +254,28 @@ def step_graph(
         result = node_fn(state, services=services) if services else node_fn(state)
         state = _merge(state, result)
 
+        # Check if the node completed without needing input (e.g.,
+        # profile_collection with no missing fields sets profile_complete).
+        # If _resolve_current_node returns a different node, the wait-for-input
+        # node finished instantly and we should keep advancing.
+        resolved = _resolve_current_node(state)
+        if resolved is not None and resolved != next_node:
+            # Continue auto-advancing through non-interactive nodes
+            follow = _next_node(next_node, state)
+            while follow and follow not in _WAIT_FOR_INPUT and follow != "end":
+                node_fn = _get_node_fn(follow)
+                result = node_fn(state, services=services) if services else node_fn(state)
+                state = _merge(state, result)
+                if follow in _TERMINAL:
+                    break
+                follow = _next_node(follow, state)
+
+            # Run the next wait-for-input node if we reached one
+            if follow and follow in _WAIT_FOR_INPUT:
+                node_fn = _get_node_fn(follow)
+                result = node_fn(state, services=services) if services else node_fn(state)
+                state = _merge(state, result)
+
     return state
 
 
