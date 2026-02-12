@@ -7,6 +7,21 @@ No LLM involvement — purely rules-driven.
 from __future__ import annotations
 
 
+_YES = {"yes", "y", "true", "1"}
+_NO = {"no", "n", "false", "0"}
+
+
+def _coerce_to_bool(value) -> bool | None:
+    """Coerce a string yes/no value to a Python bool, or return None."""
+    if isinstance(value, bool):
+        return value
+    if isinstance(value, str) and value.strip().lower() in _YES:
+        return True
+    if isinstance(value, str) and value.strip().lower() in _NO:
+        return False
+    return None
+
+
 def evaluate(
     profile: dict, rules: dict
 ) -> tuple[str, list[str]]:
@@ -42,7 +57,12 @@ def evaluate(
             if value < rule["value"]:
                 reasons.append(f"{field}_below_minimum")
         elif operator == "==":
-            if value != rule["value"]:
+            cmp_value = value
+            if isinstance(rule["value"], bool):
+                coerced = _coerce_to_bool(value)
+                if coerced is not None:
+                    cmp_value = coerced
+            if cmp_value != rule["value"]:
                 reasons.append(f"{field}_not_met")
 
     # Check exclusion criteria
@@ -54,8 +74,14 @@ def evaluate(
         value = profile[field]
         operator = rule["operator"]
 
-        if operator == "==" and value == rule["value"]:
-            reasons.append(f"{field}_excluded")
+        if operator == "==":
+            cmp_value = value
+            if isinstance(rule["value"], bool):
+                coerced = _coerce_to_bool(value)
+                if coerced is not None:
+                    cmp_value = coerced
+            if cmp_value == rule["value"]:
+                reasons.append(f"{field}_excluded")
         elif operator == "contains_any":
             if isinstance(value, str):
                 value_lower = value.lower()

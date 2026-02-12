@@ -74,6 +74,18 @@ PROFILE_FIELD_GROUPS = [
 ]
 
 
+# ---------------------------------------------------------------------------
+# Prescreen question ID → lead record column name
+# (only stable numeric fields with clear 1:1 DB column mappings)
+# ---------------------------------------------------------------------------
+
+PRESCREEN_TO_LEAD_FIELD = {
+    "cigarettes_per_day": "cigarettes_per_day",
+    "cigarette_days_per_week": "cigarette_days_per_week",
+    "cigarette_years": "cigarette_years_smoked",
+}
+
+
 def _next_group_for_missing(missing: list[str]) -> dict | None:
     """Find the first group that has any missing fields."""
     missing_set = set(missing)
@@ -463,10 +475,32 @@ def _check_disqualify_on(question: dict, answer: str) -> bool:
     return answer == disqualify_on
 
 
-def prescreen_node(state: dict, **kwargs) -> dict:
+def _advance_past_answered(questions, start_index, lead_record, prescreen_answers):
+    """Skip prescreen questions whose answer already exists in the lead record.
+
+    Auto-fills prescreen_answers for skipped questions and returns
+    (next_index, updated_answers) where next_index is the first question
+    that still needs asking, or len(questions) if all are answered.
+    """
+    answers = dict(prescreen_answers)
+    idx = start_index
+    while idx < len(questions):
+        q = questions[idx]
+        lead_field = PRESCREEN_TO_LEAD_FIELD.get(q["id"])
+        if lead_field and lead_record and lead_record.get(lead_field) is not None:
+            # Auto-fill from lead record
+            answers[q["id"]] = str(lead_record[lead_field])
+            idx += 1
+            continue
+        break
+    return idx, answers
+
+
+def prescreen_node(state: dict, services: dict | None = None, **kwargs) -> dict:
     questions = state["study_config"]["pre_screen"]["questions"]
     index = state["current_prescreen_index"]
     current_step = state.get("current_step", "")
+    lead_record = state.get("lead_record") or {}
 
     # If we're collecting an answer to a prescreen question
     if current_step.startswith("prescreen:"):
@@ -474,6 +508,14 @@ def prescreen_node(state: dict, **kwargs) -> dict:
         user_text = _last_user_text(state).strip().lower()
         new_answers = {**state.get("prescreen_answers", {}), q_id: user_text}
         new_index = index + 1
+
+        # Persist mapped prescreen fields to lead record
+        lead_field = PRESCREEN_TO_LEAD_FIELD.get(q_id)
+        if lead_field and services and state.get("lead_id"):
+            try:
+                services["db"].update_lead(state["lead_id"], {lead_field: user_text})
+            except Exception:
+                pass  # Non-critical; answers are still in session state
 
         # Check if this answer triggers disqualification
         current_question = _find_question_by_id(questions, q_id)
@@ -483,6 +525,11 @@ def prescreen_node(state: dict, **kwargs) -> dict:
                 "current_prescreen_index": new_index,
                 "current_step": "prescreen_disqualified",
             }
+
+        # Skip past questions already answered in lead record
+        new_index, new_answers = _advance_past_answered(
+            questions, new_index, lead_record, new_answers,
+        )
 
         if new_index >= len(questions):
             return {
@@ -500,20 +547,47 @@ def prescreen_node(state: dict, **kwargs) -> dict:
             "messages": state["messages"] + [_msg("assistant", next_q["question"])],
         }
 
-    # First entry or asking current question
-    if index < len(questions):
-        q = questions[index]
+    # First entry — skip past any already-answered questions
+    index, filled_answers = _advance_past_answered(
+        questions, index, lead_record, state.get("prescreen_answers", {}),
+    )
+
+    if index >= len(questions):
         return {
-            "current_step": f"prescreen:{q['id']}",
-            "messages": state["messages"] + [_msg("assistant", q["question"])],
+            "prescreen_answers": filled_answers,
+            "current_prescreen_index": index,
+            "current_step": "prescreen_complete",
         }
 
-    return {"current_step": "prescreen_complete", "current_prescreen_index": index}
+    q = questions[index]
+    return {
+        "prescreen_answers": filled_answers,
+        "current_prescreen_index": index,
+        "current_step": f"prescreen:{q['id']}",
+        "messages": state["messages"] + [_msg("assistant", q["question"])],
+    }
 
 
 # ---------------------------------------------------------------------------
 # Eligibility
 # ---------------------------------------------------------------------------
+
+def _coerce_prescreen_value(value: str):
+    """Coerce a prescreen answer string to int, float, or bool if possible."""
+    if value.lower() in ("yes", "true"):
+        return True
+    if value.lower() in ("no", "false"):
+        return False
+    try:
+        return int(value)
+    except (ValueError, TypeError):
+        pass
+    try:
+        return float(value)
+    except (ValueError, TypeError):
+        pass
+    return value
+
 
 def eligibility_node(state: dict, **kwargs) -> dict:
     # Build profile from lead_record + collected_answers
@@ -522,6 +596,12 @@ def eligibility_node(state: dict, **kwargs) -> dict:
         profile.update(state["lead_record"])
     if state.get("collected_answers"):
         profile.update(state["collected_answers"])
+
+    # Merge prescreen answers (only for fields not already present)
+    for q_id, raw_value in (state.get("prescreen_answers") or {}).items():
+        lead_field = PRESCREEN_TO_LEAD_FIELD.get(q_id, q_id)
+        if lead_field not in profile or profile[lead_field] is None:
+            profile[lead_field] = _coerce_prescreen_value(raw_value)
 
     # Calculate age from date_of_birth if present
     if "date_of_birth" in profile and profile["date_of_birth"] and "age" not in profile:
