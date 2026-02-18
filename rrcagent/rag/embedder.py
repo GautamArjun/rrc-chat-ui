@@ -55,7 +55,7 @@ class GeminiEmbedder:
     def __init__(
         self,
         api_key: str | None = None,
-        model: str = "text-embedding-004",
+        model: str = "gemini-embedding-001",
     ):
         self.api_key = api_key or os.environ.get("GOOGLE_API_KEY")
         if not self.api_key:
