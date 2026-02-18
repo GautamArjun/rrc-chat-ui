@@ -11,6 +11,22 @@ _YES = {"yes", "y", "true", "1"}
 _NO = {"no", "n", "false", "0"}
 
 
+def _coerce_to_number(value):
+    """Coerce a value to int or float if possible, else return as-is."""
+    if isinstance(value, (int, float)):
+        return value
+    if isinstance(value, str):
+        try:
+            return int(value)
+        except (ValueError, TypeError):
+            pass
+        try:
+            return float(value)
+        except (ValueError, TypeError):
+            pass
+    return value
+
+
 def _coerce_to_bool(value) -> bool | None:
     """Coerce a string yes/no value to a Python bool, or return None."""
     if isinstance(value, bool):
@@ -51,9 +67,11 @@ def evaluate(
 
         if operator == "between":
             low, high = rule["values"]
+            value = _coerce_to_number(value)
             if not (low <= value <= high):
                 reasons.append(f"{field}_out_of_range")
         elif operator == ">=":
+            value = _coerce_to_number(value)
             if value < rule["value"]:
                 reasons.append(f"{field}_below_minimum")
         elif operator == "==":

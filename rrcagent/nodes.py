@@ -83,6 +83,11 @@ PRESCREEN_TO_LEAD_FIELD = {
     "cigarettes_per_day": "cigarettes_per_day",
     "cigarette_days_per_week": "cigarette_days_per_week",
     "cigarette_years": "cigarette_years_smoked",
+    # Profile-overlapping fields — skip if already collected during profile
+    "smartphone_surveys": "has_smartphone",
+    "pregnancy_status": "pregnant_or_nursing_or_planning",
+    "medical_conditions": "serious_medical_conditions",
+    "medications": "medications_last_30_days",
 }
 
 
